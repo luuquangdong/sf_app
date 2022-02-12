@@ -27,6 +27,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Ứng dụng muốn truy cập vào thư viện ảnh của bạn"
+        }
+      ]
+    ]
   }
 }

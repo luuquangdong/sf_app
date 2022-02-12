@@ -1,10 +1,16 @@
 import { Formik } from "formik";
-import React from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as yup from "yup";
 import MainButton from "../component/MainButton";
 import { textInput } from "../constant/formStyle";
+import { ERRORS } from "../constant/errors";
+import { signUp } from "../apis/authApi";
+import { useSetRecoilState } from "recoil";
+import { initPhoneNumberState } from "../recoil/atoms/initPhoneNumberState";
+import AwesomeAlert from "react-native-awesome-alerts";
+import { COLORS } from "../constant/colors";
 
 const signUpValidationSchema = yup.object().shape({
   phoneNumber: yup
@@ -19,12 +25,35 @@ const signUpValidationSchema = yup.object().shape({
     .string()
     .oneOf([yup.ref("password")], "Mật khẩu không khớp")
     .required("Bạn chưa xác nhận mật khẩu"),
-  fullName: yup.string().required("Bạn chưa nhập họ tên"),
+  name: yup.string().required("Bạn chưa nhập họ tên"),
 });
 
-export default function SignUpScreen({ navigation }) {
-  const handleSignUpPress = (values) => {
-    console.log(values);
+export default function SignUpScreen({ navigation, route }) {
+  const setPhoneNumber = useSetRecoilState(initPhoneNumberState);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleSignUpPress = async (values, formProps) => {
+    try {
+      await signUp(values);
+
+      setShowAlert(true);
+      // Alert.alert("Đăng ký thành công", "", [
+      //   {
+      //     text: "Đồng ý",
+      //     onPress: () => {
+      //       // route.params.onGoBack(values.phoneNumber);
+      //       setPhoneNumber(values.phoneNumber);
+
+      //       setTimeout(() => navigation.pop(), 600);
+      //     },
+      //   },
+      // ]);
+    } catch (err) {
+      if (err.code && ERRORS[err.code]) {
+        formProps.setErrors(ERRORS[err.code]);
+      }
+      console.log({ err });
+    }
   };
 
   return (
@@ -34,7 +63,7 @@ export default function SignUpScreen({ navigation }) {
           phoneNumber: "",
           password: "",
           confirmPassword: "",
-          fullName: "",
+          name: "",
         }}
         onSubmit={handleSignUpPress}
         validationSchema={signUpValidationSchema}
@@ -91,16 +120,39 @@ export default function SignUpScreen({ navigation }) {
               <Text style={styles.label}>Họ tên</Text>
               <TextInput
                 style={styles.input}
-                value={values.fullName}
-                onChangeText={handleChange("fullName")}
-                onBlur={handleBlur("fullName")}
+                value={values.name}
+                onChangeText={handleChange("name")}
+                onBlur={handleBlur("name")}
               />
-              {errors.fullName && touched.fullName && (
-                <Text style={styles.error}>{errors.fullName}</Text>
+              {errors.name && touched.name && (
+                <Text style={styles.error}>{errors.name}</Text>
               )}
             </View>
             <View style={{ margin: 6 }} />
             <MainButton text="Đăng ký" onPress={handleSubmit} />
+            <AwesomeAlert
+              show={showAlert}
+              showProgress={false}
+              title="Thành công"
+              message="Đăng ký thành công"
+              closeOnTouchOutside={true}
+              closeOnHardwareBackPress={false}
+              // showCancelButton={true}
+              showConfirmButton={true}
+              // cancelText="No, cancel"
+              confirmText="OK"
+              confirmButtonColor={COLORS.success}
+              // onCancelPressed={() => {
+              //   this.hideAlert();
+              // }}
+              onConfirmPressed={() => {
+                setShowAlert(false);
+              }}
+              onDismiss={() => {
+                setPhoneNumber(values.phoneNumber);
+                setTimeout(() => navigation.pop(), 500);
+              }}
+            />
           </>
         )}
       </Formik>

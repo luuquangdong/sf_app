@@ -1,23 +1,34 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Avatar from "../Avatar";
 
-export default function ZoomMessageItem({ zoom }) {
+export default function ZoomMessageItem({ room, meId }) {
   const navigation = useNavigation();
 
   const handleZoomPress = () => {
-    navigation.push("DetailChat", { title: zoom.zoomName });
+    navigation.push("DetailChat", {
+      title: room.guest?.name ?? "X",
+      roomId: room.id,
+      guest: room.guest,
+    });
   };
 
   return (
     <TouchableOpacity style={styles.container} onPress={handleZoomPress}>
-      <Image
-        style={styles.avatar}
-        source={{ uri: "https://picsum.photos/200" }}
+      {/* <Image style={styles.avatar} source={{ uri: room.guest?.avatar?.url }} /> */}
+      <Avatar
+        name={room.guest?.name ?? "A"}
+        url={room.guest?.avatar?.url}
+        size={48}
       />
       <View style={styles.info}>
-        <Text style={styles.zoomName}>{zoom.zoomName}</Text>
-        <Text style={styles.lastMessage}>{zoom.messages[0].content}</Text>
+        <Text numberOfLines={1} style={styles.zoomName}>
+          {room.guest?.name ?? "X"}
+        </Text>
+        <Text numberOfLines={1} style={styles.lastMessage}>{`${
+          room.messages?.[0].senderId === meId ? "Tôi: " : ""
+        }${room.messages?.[0]?.content}`}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -43,7 +54,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   zoomName: {
-    fontWeight: "bold",
+    fontWeight: "600",
   },
-  lastMessage: {},
+  lastMessage: {
+    fontSize: 12,
+    color: "#A5ABAF",
+  },
 });

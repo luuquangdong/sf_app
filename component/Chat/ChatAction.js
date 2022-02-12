@@ -1,17 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Keyboard, StyleSheet, TextInput, View } from "react-native";
 import { useKeyboardHeight } from "../../hooks/useKeyboardHeight";
 
-const ChatAction = () => {
+const ChatAction = ({ sendMessage }) => {
+  const [message, setMessage] = useState("");
   const paddingInput = useKeyboardHeight();
+
+  const handleSendPress = () => {
+    if (!message) return;
+    sendMessage(message);
+    setMessage("");
+  };
   return (
     <View style={styles.container}>
       <TextInput
+        value={message}
+        onChangeText={setMessage}
         style={styles.input}
         multiline
         onSubmitEditing={Keyboard.dismiss}
       />
-      <Button title="Send" style={styles.button} />
+      <Button title="Send" style={styles.button} onPress={handleSendPress} />
     </View>
   );
 };

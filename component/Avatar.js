@@ -3,10 +3,10 @@ import { Image, StyleSheet, Text, View } from "react-native";
 
 const Avatar = ({ url, name = "Anonymous", size = 40 }) => {
   const [valid, setValid] = useState(true);
-
   useEffect(() => {
     if (!url) setValid(false);
-  }, []);
+    else setValid(true);
+  }, [url]);
 
   return (
     <View
@@ -43,5 +43,9 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "#B6465F",
+    textAlign: "center",
+    textAlignVertical: "center",
+    padding: 0,
+    margin: 0,
   },
 });

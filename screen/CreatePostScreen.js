@@ -1,27 +1,171 @@
-import React from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
-import Avatar from "../component/Avatar";
-import { useKeyboardHeight } from "../hooks/useKeyboardHeight";
+import React, { useState } from "react";
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const CreatePostScreen = () => {
-  const keyboardHeight = useKeyboardHeight();
+import MyImage from "../component/MyImage";
+import { ICON_SIZE } from "../constant/headerBar";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { userState } from "../recoil/atoms/userState";
+import { dataBackState } from "../recoil/atoms/dataBackState";
+import { createPost } from "../apis/postApi";
+import AwesomeAlert from "react-native-awesome-alerts";
+import { COLORS } from "../constant/colors";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+const CreatePostScreen = ({ navigation }) => {
+  const user = useRecoilValue(userState);
+  const setDataBack = useSetRecoilState(dataBackState);
+
+  // const keyboardHeight = useKeyboardHeight();
+  const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [hasText, setHasText] = useState(false);
+  const [description, setDescription] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleUploadImage = async () => {
+    let permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Không được phép truy cập thư viện ảnh");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      presentationStyle: 0,
+    });
+    console.log(pickerResult);
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+    setImageFile(pickerResult);
+  };
+
+  const handleCancelPress = () => {
+    setImageFile(null);
+  };
+
+  const handleCreatePostPress = async () => {
+    const data = new FormData();
+    data.append("authorId", user?.phoneNumber);
+    if (description) {
+      console.log("description", description);
+      data.append("content", description);
+    }
+    if (imageFile) {
+      data.append("image", {
+        name: imageFile.fileName ?? `${Date.now()}`,
+        type: imageFile.type ?? "image",
+        uri:
+          Platform.OS === "ios"
+            ? imageFile.uri.replace("file://", "")
+            : imageFile.uri,
+      });
+    }
+    setLoading(true);
+    try {
+      const p = await createPost(data);
+      console.log("ok");
+      setDataBack(p);
+      setLoading(false);
+      setShowAlert(true);
+    } catch (err) {
+      console.log({ err });
+      setLoading(false);
+      Alert.alert("Có lỗi xảy ra, đăng bài thất bại!");
+    }
+  };
+
+  const handleTextChange = (newTxt) => {
+    const tmp = newTxt;
+    setDescription(tmp);
+    setHasText(tmp.length != 0);
+  };
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          activeOpacity={0.5}
+          disabled={loading || !(hasText || imageFile !== null)}
+          onPress={handleCreatePostPress}
+          style={{ marginRight: 8 }}
+        >
+          <MaterialIcons
+            name="send"
+            size={ICON_SIZE}
+            color={
+              loading || !(hasText || imageFile !== null) ? "#DDD" : "#FFF"
+            }
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, loading, imageFile, description]);
 
   return (
-    <View style={[styles.container, { marginBottom: keyboardHeight }]}>
+    <KeyboardAwareScrollView>
+      <View style={styles.action}>
+        <TouchableOpacity style={styles.actionBtn} onPress={handleUploadImage}>
+          <Text>Đăng ảnh</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBtn}>
+          <Text>Đăng video</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.inputSection}>
         <TextInput
           placeholder="Bạn đang nghĩ gì?"
           multiline
           style={styles.textIpt}
+          value={description}
+          onChangeText={handleTextChange}
         />
       </View>
-      <View style={styles.action}>
-        <Button title="Up Image" style={{ flex: 1 }} />
-        <Button title="Up Video" style={{ flex: 1 }} />
-        <Avatar url="https://picsum.photos/200" size={36} />
-        <Avatar size={36} url={null} />
-      </View>
-    </View>
+      <View style={{ flex: 1 }} />
+      {imageFile && (
+        <View>
+          <View style={{ justifyContent: "flex-end", flexDirection: "row" }}>
+            <TouchableOpacity onPress={handleCancelPress}>
+              <Text style={styles.cancelTxt}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+          <MyImage
+            width={imageFile.width}
+            height={imageFile.height}
+            url={imageFile.uri}
+          />
+        </View>
+      )}
+
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={false}
+        title="Thành công"
+        message="Đăng bài thành công"
+        closeOnTouchOutside={true}
+        closeOnHardwareBackPress={false}
+        showConfirmButton={true}
+        confirmText="OK"
+        confirmButtonColor={COLORS.success}
+        onConfirmPressed={() => {
+          setShowAlert(false);
+        }}
+        onDismiss={() => {
+          setTimeout(() => navigation.pop(), 500);
+        }}
+      />
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -31,18 +175,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-    paddingHorizontal: 12,
     paddingTop: 12,
   },
   inputSection: {
     flex: 1,
+    paddingHorizontal: 12,
   },
   textIpt: {
     fontSize: 18,
     color: "#26547C",
-    flex: 1,
+    minHeight: 60,
   },
   action: {
     flexDirection: "row",
+  },
+  actionBtn: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    paddingVertical: 8,
+  },
+  cancelTxt: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderColor: "#DDD",
+    borderWidth: 0.5,
+    fontSize: 12,
+    color: "red",
   },
 });

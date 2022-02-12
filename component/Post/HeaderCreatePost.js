@@ -1,21 +1,22 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../recoil/atoms/userState";
+import Avatar from "../Avatar";
 
 export default function PostHeader({ navigation }) {
+  const user = useRecoilValue(userState);
   const handleCreatePostPress = () => {
     navigation.push("CreatePost");
   };
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Image
-          style={styles.image}
-          source={{ uri: "https://picsum.photos/200" }}
-        />
-        <TouchableOpacity onPress={handleCreatePostPress}>
-          <Text>Hôm nay bạn thế nào</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={handleCreatePostPress}>
+        <View style={styles.content}>
+          <Avatar url={user?.avatar?.url} name={user?.name} size={44} />
+          <Text style={{ marginLeft: 8 }}>Hôm nay bạn thế nào?</Text>
+        </View>
+      </TouchableOpacity>
       <View style={styles.action}>
         <TouchableOpacity style={styles.actionBtn}>
           <Text>Đăng ảnh</Text>

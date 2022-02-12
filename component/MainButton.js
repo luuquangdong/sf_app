@@ -3,7 +3,12 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { COLORS } from "../constant/colors";
 
 export default function MainButton(props) {
-  const { text, onPress, backgroundColor, color } = props;
+  const { text, onPress, backgroundColor, color, disabled } = props;
+
+  const handleOnPress = () => {
+    if (disabled) return;
+    if (onPress) onPress();
+  };
 
   return (
     <TouchableOpacity

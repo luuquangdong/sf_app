@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Image,
@@ -10,22 +10,39 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useRecoilValue } from "recoil";
+import { createComment } from "../../apis/commentApi";
+import { userState } from "../../recoil/atoms/userState";
+import Avatar from "../Avatar";
 
-export default function CreateComment() {
+export default function CreateComment({ postId, addComment }) {
+  const user = useRecoilValue(userState);
+  const [content, setContent] = useState("");
+
+  const handleSendPressed = async () => {
+    if (!content.trim()) return;
+    try {
+      const cmt = await createComment({ postId: postId, content: content });
+      if (addComment) addComment(cmt);
+      setContent("");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.avatar}
-        source={{ uri: "https://picsum.photos/200" }}
-      />
+      <Avatar url={user?.avatar?.url} name={user?.name} size={36} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <TextInput
           style={styles.createCommentTxt}
           multiline={true}
           placeholder="Viết bình luận"
+          value={content}
+          onChangeText={setContent}
         />
       </TouchableWithoutFeedback>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleSendPressed}>
         <Text>ĐĂNG</Text>
       </TouchableOpacity>
     </View>

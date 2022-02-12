@@ -1,20 +1,23 @@
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../recoil/atoms/userState";
 import { MessageItem, MyMessageItem } from "./MessageItem";
+import Avatar from "../Avatar";
 
-const LineMessage = ({ message }) => {
-  const { sender, isFirst } = message;
+const LineMessage = ({ message, guest }) => {
+  const { phoneNumber: meId } = useRecoilValue(userState);
+
+  const { senderId, isFirst, isLast } = message;
+
   return (
-    <View style={[styles.container, { marginTop: isFirst ? 16 : 4 }]}>
+    <View style={[styles.container, { marginTop: isLast ? 16 : 4 }]}>
       <View style={styles.avatarSection}>
-        {isFirst && sender !== "Me" && (
-          <Image
-            style={styles.image}
-            source={{ uri: "https://picsum.photos/200" }}
-          />
+        {isLast && senderId !== meId && (
+          <Avatar size={30} url={guest?.avatar?.url} name={guest?.name} />
         )}
       </View>
-      {sender === "Me" && (
+      {senderId === meId && (
         <View
           style={{
             justifyContent: "flex-end",
@@ -26,7 +29,7 @@ const LineMessage = ({ message }) => {
           <MyMessageItem message={message} />
         </View>
       )}
-      {sender !== "Me" && (
+      {senderId !== meId && (
         <>
           <MessageItem message={message} />
           <View style={styles.space}></View>

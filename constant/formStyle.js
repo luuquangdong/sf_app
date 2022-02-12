@@ -2,7 +2,7 @@ export const textInput = {
   height: 40,
   padding: 8,
   borderWidth: 1,
-  borderColor: "#aaa",
+  borderColor: "#DDD",
   backgroundColor: "#fff",
   borderRadius: 4,
 };
