@@ -12,12 +12,13 @@ import {
 } from "react-native";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import * as yup from "yup";
+import { Formik } from "formik";
+
 import MainButton from "../component/MainButton";
 import { COLORS } from "../constant/colors";
 import { textInput } from "../constant/formStyle";
 import { userState } from "../recoil/atoms/userState";
 import { login } from "../apis/authApi";
-import { Formik } from "formik";
 import { saveLogInfo } from "../utils/authUtil";
 import { initPhoneNumberState } from "../recoil/atoms/initPhoneNumberState";
 
@@ -59,6 +60,12 @@ export default function LoginScreen({ navigation }) {
       const { user, token } = await login(phoneNumber, password);
       console.log({ user, token });
 
+      if (user.banned) {
+        others.setErrors({ password: "Tài khoản đã bị khóa" });
+        setLoading(false);
+        return;
+      }
+
       await saveLogInfo(token, user, phoneNumber);
 
       setLoading(false);
@@ -69,7 +76,7 @@ export default function LoginScreen({ navigation }) {
       if (user.updatedInfo) {
         navigation.replace("MainScreen");
       } else {
-        navigation.replace("UpdateInfo");
+        navigation.replace("FirstUpdateInfo");
       }
     } catch (err) {
       setLoading(false);

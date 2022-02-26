@@ -1,6 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
+
 import { getMyTournaments } from "../../apis/tournamentApi";
 import EmptyComponent from "../../component/EmptyComponent";
 import MyHeader from "../../component/MyHeader";

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { useRecoilValue } from "recoil";
+
 import { findFriend } from "../../apis/userApi";
+import EmptyComponent from "../../component/EmptyComponent";
 import SearchForm from "../../component/FindFriend/SearchForm";
 import UserInfoItem from "../../component/FindFriend/UserInfoItem";
 import MyHeader from "../../component/MyHeader";
@@ -11,11 +13,15 @@ import { caculateAge } from "../../utils/userUtil";
 
 const Separator = () => <View style={{ height: 8 }}></View>;
 
+const SIZE = 20;
+
 const FindFriendScreen = ({ navigation }) => {
   const me = useRecoilValue(userState);
   const [searchMode, setSearchMode] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchData, setSearchData] = useState([]);
+  const [endOfData, setEndOfData] = useState(false);
 
   const closeSearchMode = () => setSearchMode(false);
   const handleSubmit = async (data) => {
@@ -25,6 +31,12 @@ const FindFriendScreen = ({ navigation }) => {
     if (!data.location?.province)
       data.location = { province: me.location?.province };
     if (!data.age) data.age = myAge;
+
+    data.index = 0;
+    data.size = SIZE;
+
+    setSearchData(data);
+
     console.log(data);
     try {
       setUsers([]);
@@ -32,6 +44,25 @@ const FindFriendScreen = ({ navigation }) => {
       const res = await findFriend(data);
       // console.log(res);
       setUsers(res);
+      setEndOfData(res.length < SIZE);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    }
+  };
+
+  const handleEndReach = async () => {
+    if (endOfData || loading) return;
+    try {
+      setLoading(true);
+      const data = { ...searchData };
+      data.index = users.length;
+
+      const res = await findFriend(data);
+      setUsers([...users, ...res]);
+
+      setEndOfData(res.length < SIZE);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -48,12 +79,20 @@ const FindFriendScreen = ({ navigation }) => {
     data.sportIds = me.sports?.map((s) => s.id);
     data.gender = me.gender;
     if (!data.age) data.age = myAge;
+
+    data.index = 0;
+    data.size = SIZE;
+
+    setSearchData(data);
     console.log(data);
 
     try {
       setLoading(true);
+
       const result = await findFriend(data);
       setUsers(result);
+
+      setEndOfData(result.length < SIZE);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -102,6 +141,13 @@ const FindFriendScreen = ({ navigation }) => {
         renderItem={({ item }) => <UserInfoItem user={item} />}
         keyExtractor={(item) => item.phoneNumber}
         ItemSeparatorComponent={Separator}
+        ListEmptyComponent={
+          <EmptyComponent
+            text={"Thành phố bạn đang sống chưa có người dùng nào"}
+          />
+        }
+        onEndReached={handleEndReach}
+        onEndReachedThreshold={0.01}
       />
     </View>
   );

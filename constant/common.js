@@ -1,3 +1,5 @@
+import locations from "../assets/locations.json";
+
 const GENDER = {
   male: "MALE",
   female: "FEMALE",
@@ -10,4 +12,4 @@ const genders = [
   { id: "OTHER", label: "Khác" },
 ];
 
-export { GENDER, genders };
+export { GENDER, genders, locations };

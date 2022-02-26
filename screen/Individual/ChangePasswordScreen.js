@@ -3,9 +3,10 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Formik } from "formik";
 import * as yup from "yup";
+import AwesomeAlert from "react-native-awesome-alerts";
+
 import { textInput } from "../../constant/formStyle";
 import MainButton from "../../component/MainButton";
-import AwesomeAlert from "react-native-awesome-alerts";
 import { COLORS } from "../../constant/colors";
 import { changePassword } from "../../apis/userApi";
 

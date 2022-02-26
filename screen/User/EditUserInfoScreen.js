@@ -6,15 +6,17 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRecoilState } from "recoil";
 import * as ImagePicker from "expo-image-picker";
 import * as yup from "yup";
 import moment from "moment";
+import { Formik } from "formik";
+import AwesomeAlert from "react-native-awesome-alerts";
+import mime from "mime";
+
 import { userState } from "../../recoil/atoms/userState";
 import { textInput } from "../../constant/formStyle";
 import { COLORS } from "../../constant/colors";
@@ -23,20 +25,17 @@ import MultipleSelectV2 from "../../component/MultipleSelectV2";
 import Avatar from "../../component/Avatar";
 import TextButton from "../../component/TextButton";
 import MainButton from "../../component/MainButton";
-import { genders } from "../../constant/common";
-import { sportListState } from "../../recoil/atoms/sportListState";
-import { getListSport } from "../../apis/sportApi";
+import { genders, locations } from "../../constant/common";
 import { genderToObject } from "../../utils/userUtil";
-import { Formik } from "formik";
 import { updateAvatar, updateUserInfo } from "../../apis/userApi";
-import AwesomeAlert from "react-native-awesome-alerts";
+import useSportList from "../../utils/useSportList";
 
 const PADDING = 10;
 
-const PROVINCES = ["Hà Nội", "Hải Phòng", "Thành Phố Hồ Chí Minh"];
-const provinces = PROVINCES.map((item) => ({ id: item, label: item }));
-const DISTRICTS = ["Hai Bà Trưng", "Đống Đa", "Long Biên", "Trương Định"];
-const districts = DISTRICTS.map((item) => ({ id: item, label: item }));
+// const PROVINCES = ["Hà Nội", "Hải Phòng", "Thành Phố Hồ Chí Minh"];
+// const provinces = PROVINCES.map((item) => ({ id: item, label: item }));
+// const DISTRICTS = ["Hai Bà Trưng", "Đống Đa", "Long Biên", "Trương Định"];
+// const districts = DISTRICTS.map((item) => ({ id: item, label: item }));
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Họ tên là bắt buộc"),
@@ -51,11 +50,9 @@ const validationSchema = yup.object().shape({
 
 const EditUserInfoScreen = ({ navigation }) => {
   const [user, setUser] = useRecoilState(userState);
-  // console.log(user);
   const [photo, setPhoto] = useState(null);
 
   const [avatar, setAvatar] = useState(user?.avatar?.url);
-  const [name, setName] = useState(user?.name);
   const [birthday, setBirthday] = useState(() => {
     if (!user?.birthday) return "";
     const [y, m, d] = user?.birthday.split("-");
@@ -65,35 +62,30 @@ const EditUserInfoScreen = ({ navigation }) => {
   const [sports, setSports] = useState(() =>
     user?.sports?.map((s) => ({ ...s, label: s.name }))
   );
-  const [province, setProvince] = useState("");
-  const [district, setDistrict] = useState("");
+  const [province, setProvince] = useState(() => {
+    const index = locations.findIndex(
+      (l) => l.label === user.location?.province
+    );
+    if (index === -1) return null;
+    return { id: locations[index].id, label: locations[index].label };
+  });
+  const [district, setDistrict] = useState(() => {
+    if (!user.location?.district) return null;
+    let index = locations.findIndex((l) => l.label === user.location.province);
+    if (index === -1) return null;
+    const ds = locations[index].districts;
+
+    return ds.find((d) => d.label === user.location.district);
+  });
   const [description, setDescription] = useState(user.description);
 
-  const [sportList, setSportList] = useRecoilState(sportListState);
+  const sportList = useSportList();
   const [error, setError] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // const [date, setDate] = useState(() => {
-  //   let date = null;
-  //   if (user.birthday) date = new Date(moment(user.birthday));
-  //   else date = new Date();
-  //   return date;
-  // });
-  // const [showDatePicker, setShowDatePicker] = useState(false);
-
-  // const onBirthdayChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || date;
-  //   setShowDatePicker(Platform.OS === "ios");
-  //   setDate(currentDate);
-
-  //   const fDate = `${currentDate.getDate()}/${
-  //     currentDate.getMonth() + 1
-  //   }/${currentDate.getFullYear()}`;
-  //   setBirthday(fDate);
-  // };
-
-  // const handleBirthdayPickerPress = () => setShowDatePicker(!showDatePicker);
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
 
   const cancelChangeAvatar = () => {
     setPhoto(null);
@@ -121,21 +113,6 @@ const EditUserInfoScreen = ({ navigation }) => {
     setPhoto(pickerResult);
   };
 
-  // const handleCheckBirthday = () => {
-  //   const birthdayRegex = /^[0,1,2,3]?\d\/[0,1]?\d\/\d{4}$/;
-  //   if (!birthdayRegex.test(birthday)) {
-  //     return setErrors({
-  //       ...errors,
-  //       birthday: "Ngày sinh phải có định dạng: Ngày/Tháng/Năm",
-  //     });
-  //   }
-  //   const [d, m, y] = birthday.split("/");
-  //   if (!moment([y, m, d]).isValid()) {
-  //     return setErrors({ ...errors, birthday: "Ngày sinh không hợp lệ" });
-  //   }
-  //   setErrors({ ...errors, birthday: null });
-  // };
-
   const handleUpdatePress = async (values, formProps) => {
     console.log(values, formProps);
     const [d, m, y] = values.birthday.split("/");
@@ -161,7 +138,7 @@ const EditUserInfoScreen = ({ navigation }) => {
       const form = new FormData();
       form.append("avatarFile", {
         name: photo.fileName ?? `${Date.now()}`,
-        type: photo.type ?? "image",
+        type: mime.getType(photo.uri),
         uri:
           Platform.OS === "ios" ? photo.uri.replace("file://", "") : photo.uri,
       });
@@ -169,9 +146,11 @@ const EditUserInfoScreen = ({ navigation }) => {
         await updateAvatar(form);
       } catch (err) {
         console.log({ err });
+        console.log(err.Error);
         setError("Cập nhật ảnh thất bại");
       }
     }
+
     const data = {
       phoneNumber: user.phoneNumber,
       name: values.name,
@@ -186,7 +165,7 @@ const EditUserInfoScreen = ({ navigation }) => {
     if (district.id) {
       data.location.district = district.label;
     }
-    console.log(data);
+    // console.log(data);
     try {
       const userUpdated = await updateUserInfo(data);
       setUser(userUpdated);
@@ -199,19 +178,20 @@ const EditUserInfoScreen = ({ navigation }) => {
     }
   };
 
-  const fetchListSport = async () => {
-    try {
-      let data = await getListSport();
-      data = data.map((s) => ({ ...s, label: s.name }));
-      setSportList(data);
-    } catch (err) {}
-  };
+  useEffect(() => {
+    const data = locations.map((l) => ({
+      label: l.label,
+      id: l.id,
+    }));
+    setProvinces(data);
+  }, []);
 
   useEffect(() => {
-    if (sportList.length === 0) {
-      fetchListSport();
-    }
-  }, []);
+    if (!province) return;
+    const index = locations.findIndex((l) => l.id === province.id);
+
+    if (index !== -1) setDistricts(locations[index]?.districts);
+  }, [province]);
 
   return (
     <KeyboardAwareScrollView style={{ backgroundColor: "#FFF" }}>
@@ -327,9 +307,6 @@ const EditUserInfoScreen = ({ navigation }) => {
                 onChangeText={setDescription}
                 multiline
                 numberOfLines={2}
-                // value={values.phoneNumber}
-                // onChangeText={handleChange("phoneNumber")}
-                // onBlur={handleBlur("phoneNumber")}
               />
               {/* {errors.phoneNumber && touched.phoneNumber && (
                 <Text style={styles.error}>{errors.phoneNumber}</Text>
@@ -344,7 +321,11 @@ const EditUserInfoScreen = ({ navigation }) => {
               </View>
             )}
             {loading && <ActivityIndicator />}
-            <MainButton text="Cập nhật" onPress={handleSubmit} />
+            <MainButton
+              text="Cập nhật"
+              onPress={handleSubmit}
+              disabled={loading}
+            />
           </View>
         )}
       </Formik>

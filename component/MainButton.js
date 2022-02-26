@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS } from "../constant/colors";
 
 export default function MainButton(props) {
@@ -13,13 +13,18 @@ export default function MainButton(props) {
   return (
     <TouchableOpacity
       activeOpacity={0.66}
-      onPress={onPress}
-      style={[
-        styles.button,
-        { backgroundColor: backgroundColor ?? COLORS.primary },
-      ]}
+      onPress={handleOnPress}
+      disabled={disabled}
     >
-      <Text style={[styles.textBtn, { color: color ?? "#fff" }]}>{text}</Text>
+      <View
+        opacity={disabled ? 0.66 : 1}
+        style={[
+          styles.button,
+          { backgroundColor: backgroundColor ?? COLORS.primary },
+        ]}
+      >
+        <Text style={[styles.textBtn, { color: color ?? "#fff" }]}>{text}</Text>
+      </View>
     </TouchableOpacity>
   );
 }

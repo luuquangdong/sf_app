@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Animated, FlatList, StyleSheet, View } from "react-native";
 import { useRecoilState, useRecoilValue } from "recoil";
+
 import { createRoom } from "../../apis/chatApi";
 import ChatAction from "../../component/Chat/ChatAction";
 import LineMessage from "../../component/Chat/LineMessage";
-import { useKeyboardHeight } from "../../hooks/useKeyboardHeight";
-import { useKeyboardHeightAnimated } from "../../hooks/useKeyboardHeightAnimated";
+import { useKeyboardHeight } from "../../utils/useKeyboardHeight";
+import { useKeyboardHeightAnimated } from "../../utils/useKeyboardHeightAnimated";
 import { userState } from "../../recoil/atoms/userState";
 import { handleRoomResp } from "../../utils/chatUltil";
 import { chatMethodState } from "../../recoil/atoms/chatMethodState";

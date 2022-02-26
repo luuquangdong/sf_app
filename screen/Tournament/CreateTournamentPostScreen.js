@@ -10,16 +10,18 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AwesomeAlert from "react-native-awesome-alerts";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import mime from "mime";
 
 import MyImage from "../../component/MyImage";
 import { ICON_SIZE } from "../../constant/headerBar";
-import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userState } from "../../recoil/atoms/userState";
 import { dataBackState } from "../../recoil/atoms/dataBackState";
 import { createTournamentPost } from "../../apis/postApi";
-import AwesomeAlert from "react-native-awesome-alerts";
 import { COLORS } from "../../constant/colors";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import VideoThumpnail from "../../component/VideoThumpnail";
 
 const CreateTournamentPostScreen = ({ navigation, route }) => {
   const { tournamentId } = route.params;
@@ -29,6 +31,7 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
 
   // const keyboardHeight = useKeyboardHeight();
   const [imageFile, setImageFile] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasText, setHasText] = useState(false);
   const [description, setDescription] = useState("");
@@ -51,10 +54,37 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
       return;
     }
     setImageFile(pickerResult);
+    setVideoFile(null);
+  };
+
+  const handlePickVideoPressed = async () => {
+    let permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Không được phép truy cập thư viện ảnh");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
+      presentationStyle: 0,
+      mediaTypes: "Videos",
+      videoMaxDuration: 60,
+    });
+    console.log(pickerResult);
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+    setVideoFile(pickerResult);
+    setImageFile(null);
   };
 
   const handleCancelPress = () => {
     setImageFile(null);
+  };
+
+  const handleCancelVideoPressed = () => {
+    setVideoFile(null);
   };
 
   const handleCreatePostPress = async () => {
@@ -68,11 +98,21 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
     if (imageFile) {
       data.append("image", {
         name: imageFile.fileName ?? `${Date.now()}`,
-        type: imageFile.type ?? "image",
+        type: mime.getType(imageFile.uri),
         uri:
           Platform.OS === "ios"
             ? imageFile.uri.replace("file://", "")
             : imageFile.uri,
+      });
+    }
+    if (videoFile) {
+      data.append("video", {
+        name: videoFile.fileName ?? `${Date.now()}`,
+        type: mime.getType(videoFile.uri),
+        uri:
+          Platform.OS === "ios"
+            ? videoFile.uri.replace("file://", "")
+            : videoFile.uri,
       });
     }
     setLoading(true);
@@ -100,7 +140,9 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
       headerRight: () => (
         <TouchableOpacity
           activeOpacity={0.5}
-          disabled={loading || !(hasText || imageFile !== null)}
+          disabled={
+            loading || !(hasText || imageFile !== null || videoFile !== null)
+          }
           onPress={handleCreatePostPress}
           style={{ marginRight: 8 }}
         >
@@ -108,13 +150,15 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
             name="send"
             size={ICON_SIZE}
             color={
-              loading || !(hasText || imageFile !== null) ? "#DDD" : "#FFF"
+              loading || !(hasText || imageFile !== null || videoFile !== null)
+                ? "#DDD"
+                : "#FFF"
             }
           />
         </TouchableOpacity>
       ),
     });
-  }, [navigation, loading, imageFile, description]);
+  }, [navigation, loading, imageFile, description, videoFile]);
 
   return (
     <KeyboardAwareScrollView>
@@ -122,7 +166,10 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
         <TouchableOpacity style={styles.actionBtn} onPress={handleUploadImage}>
           <Text>Đăng ảnh</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={handlePickVideoPressed}
+        >
           <Text>Đăng video</Text>
         </TouchableOpacity>
       </View>
@@ -138,7 +185,12 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
       <View style={{ flex: 1 }} />
       {imageFile && (
         <View>
-          <View style={{ justifyContent: "flex-end", flexDirection: "row" }}>
+          <View
+            style={{
+              justifyContent: "flex-end",
+              flexDirection: "row",
+            }}
+          >
             <TouchableOpacity onPress={handleCancelPress}>
               <Text style={styles.cancelTxt}>Hủy</Text>
             </TouchableOpacity>
@@ -150,7 +202,16 @@ const CreateTournamentPostScreen = ({ navigation, route }) => {
           />
         </View>
       )}
-
+      {videoFile && (
+        <View>
+          <View style={{ justifyContent: "flex-end", flexDirection: "row" }}>
+            <TouchableOpacity onPress={handleCancelVideoPressed}>
+              <Text style={styles.cancelTxt}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+          <VideoThumpnail uri={videoFile.uri} />
+        </View>
+      )}
       <AwesomeAlert
         show={showAlert}
         showProgress={false}
@@ -191,6 +252,7 @@ const styles = StyleSheet.create({
   },
   action: {
     flexDirection: "row",
+    backgroundColor: "#FFF",
   },
   actionBtn: {
     flex: 1,

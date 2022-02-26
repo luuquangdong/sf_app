@@ -39,12 +39,12 @@ const TournamentsScreen = ({ navigation }) => {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      const data = await getListTournament(SIZE, null);
+      const data = await getListTournament(0, SIZE);
       setTournaments([...data]);
-      if (data.length > 0) setLastTournamentId(data[data.length - 1].id);
       setEndOfData(data.length < SIZE);
     } catch (err) {
       console.log({ err });
+      console.log(err.response);
     } finally {
       setRefreshing(false);
     }
@@ -54,10 +54,10 @@ const TournamentsScreen = ({ navigation }) => {
     if (endOfData || loading) return;
     setLoading(true);
     try {
-      const data = await getListTournament(SIZE, lastTournamentId);
+      console.log(tournaments.length, SIZE);
+      const data = await getListTournament(tournaments.length, SIZE);
       // console.log(data);
       setTournaments([...tournaments, ...data]);
-      if (data.length > 0) setLastTournamentId(data[data.length - 1].id);
       setEndOfData(data.length < SIZE);
     } catch (err) {
       console.log({ err });
@@ -83,12 +83,12 @@ const TournamentsScreen = ({ navigation }) => {
               title="Giải đấu của tôi"
               onPress={handleMyTournamentPressed}
             />
-            <Separator />
-            {openSearch ? (
+            {/* <Separator />
+             {openSearch ? (
               <SearchForm closeSearch={closeSearch} />
             ) : (
               <Search onPress={hanleOpenSearch} />
-            )}
+            )} */}
           </View>
         }
         onEndReached={handleEndReach}

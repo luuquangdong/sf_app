@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "sff_app",
-    "slug": "sff_app",
+    "name": "sf_app",
+    "slug": "sf_app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "owner": "codesml",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

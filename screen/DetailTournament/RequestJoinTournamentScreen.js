@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View, ActivityIndicator } from "react-native";
 import { useRecoilState } from "recoil";
+
 import { tournamentState } from "../../recoil/atoms/tournamentState";
 import TileConfirm from "../../component/TileConfirm";
 import EmptyComponent from "../../component/EmptyComponent";

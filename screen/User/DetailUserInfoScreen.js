@@ -1,18 +1,21 @@
 import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRecoilValue } from "recoil";
+
 import { deleteFriend, requestFriend } from "../../apis/friendApi";
 import { getListPostOfUser } from "../../apis/postApi";
 import { getUserInfo } from "../../apis/userApi";
 import CommentBottomSheet from "../../component/Comment/CommentBottomSheet";
 import LocalErrorBoundary from "../../component/LocalErrorBoudary";
+import MyButton from "../../component/MyButton";
 import Menu2 from "../../component/Post/Menu2";
 import PostItem from "../../component/Post/PostItem";
 import ReportPostMenu from "../../component/Post/ReportPostMenu";
 import Profile from "../../component/Profile";
 import Separator from "../../component/Separator";
 import TextButton from "../../component/TextButton";
+import { COLORS } from "../../constant/colors";
 import { userState } from "../../recoil/atoms/userState";
 
 const DetailUserInfoScreen = ({ route, navigation }) => {
@@ -111,14 +114,21 @@ const DetailUserInfoScreen = ({ route, navigation }) => {
           ) : (
             <>
               {user?.friend ? (
-                <TextButton onPress={handleDeleteFriend} text="Xóa bạn" />
+                <MyButton
+                  onPress={handleDeleteFriend}
+                  text="Xóa bạn"
+                  backgroundColor="#999"
+                />
               ) : (
-                <TextButton
+                <MyButton
                   onPress={handleRequest}
                   text={user?.requestedFriend ? "Hủy yêu cầu" : "Kết bạn"}
+                  backgroundColor={
+                    user?.requestedFriend ? "#999" : COLORS.primary
+                  }
                 />
               )}
-              <TextButton onPress={handleMessagePress} text="Nhắn tin" />
+              <MyButton onPress={handleMessagePress} text="Nhắn tin" />
             </>
           )}
         </View>

@@ -62,10 +62,48 @@ const getListUser = async (data) => {
 };
 
 const changePassword = async (data) => {
-  console.log(data);
   try {
     console.log("changePassword");
     const response = await axiosInstance.post("/users/change-password", data);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const signupOrg = async (formData) => {
+  try {
+    console.log("signupOrg");
+    const response = await axiosInstance.post(
+      "/users/signup-organization",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const setUserPushToken = async (pushToken) => {
+  console.log(pushToken);
+  try {
+    console.log("setPushToken");
+    const response = await axiosInstance.post(`/users/set-push-token`, {
+      pushToken: pushToken,
+    });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const removeUserPushToken = async () => {
+  try {
+    console.log("removeUserPushToken");
+    const response = await axiosInstance.delete("/users/remove-push-token");
     return response.data;
   } catch (err) {
     throw err;
@@ -79,4 +117,7 @@ export {
   updateUserInfo,
   getListUser,
   changePassword,
+  setUserPushToken,
+  removeUserPushToken,
+  signupOrg,
 };

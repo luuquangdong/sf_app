@@ -21,12 +21,14 @@ const Select = ({ items: its, onItemChange, selectedValue, label }) => {
   const closeModal = () => setVisible(false);
 
   useEffect(() => {
+    if (!its) return;
+
     setItems([{ id: "", label: label }, ...its]);
   }, [its]);
 
   const handleItemPress = (item) => {
     console.log(item);
-    if (!item.id) onItemChange(null);
+    if (!item?.id) onItemChange(null);
     else onItemChange(item);
 
     closeModal();
@@ -53,12 +55,8 @@ const Select = ({ items: its, onItemChange, selectedValue, label }) => {
           </TouchableWithoutFeedback>
           <View style={styles.inner}>
             <ScrollView>
-              {items.map((item) => (
-                <SelectItem
-                  key={item.id}
-                  item={item}
-                  itemPress={handleItemPress}
-                />
+              {items.map((x) => (
+                <SelectItem key={x?.id} item={x} itemPress={handleItemPress} />
               ))}
             </ScrollView>
           </View>

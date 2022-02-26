@@ -13,12 +13,14 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import * as yup from "yup";
 import * as ImagePicker from "expo-image-picker";
 import { Dimensions } from "react-native";
+import mime from "mime";
+
 import MainButton from "../MainButton";
 import TextButton from "../TextButton";
 import { COLORS } from "../../constant/colors";
 import { textInput } from "../../constant/formStyle";
 import { useNavigation } from "@react-navigation/native";
-import useSportList from "../../hooks/useSportList";
+import useSportList from "../../utils/useSportList";
 import Select from "../Select";
 import { sportIdToObject } from "../../utils/userUtil";
 
@@ -45,15 +47,17 @@ const PADDING = 12;
 const bannerWidth = Dimensions.get("window").width - 4 * PADDING;
 
 const EditTournamentComponent = ({ tournament, onOkPress, successMessage }) => {
+  const [textHeight, setTextHeight] = useState(20);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const [photo, setPhoto] = useState(null);
+
   const [showAlert, setShowAlert] = useState(false);
   const [sport, setSport] = useState(() => {
     if (!tournament?.sportName) return null;
     return { id: tournament.sportId, label: tournament.sportName };
   });
   const sportList = useSportList();
-  // console.log(sportList);
   const formMilkRef = useRef(null);
 
   const handleSportChange = (selectedValue) => {
@@ -101,12 +105,13 @@ const EditTournamentComponent = ({ tournament, onOkPress, successMessage }) => {
     }
     if (!onOkPress) return;
     try {
+      setLoading(true);
       let form = null;
       if (photo) {
         form = new FormData();
         form.append("banner", {
           name: photo.fileName ?? `${Date.now()}`,
-          type: photo.type ?? "image",
+          type: mime.getType(photo.uri),
           uri:
             Platform.OS === "ios"
               ? photo.uri.replace("file://", "")
@@ -118,8 +123,10 @@ const EditTournamentComponent = ({ tournament, onOkPress, successMessage }) => {
         form,
         formProps
       );
+      setLoading(false);
       setShowAlert(true);
     } catch (err) {
+      setLoading(false);
       console.log({ err });
     }
   };
@@ -232,16 +239,23 @@ const EditTournamentComponent = ({ tournament, onOkPress, successMessage }) => {
             <View style={styles.formGroup}>
               <Text style={styles.label}>Chi tiết</Text>
               <TextInput
-                style={[styles.input, styles.details]}
+                style={[styles.input, styles.details, { height: textHeight }]}
                 value={values.details}
                 onChangeText={handleChange("details")}
                 onBlur={handleBlur("details")}
+                onContentSizeChange={(e) =>
+                  setTextHeight(e.nativeEvent.contentSize.height)
+                }
                 multiline
               />
             </View>
-            <View style={{ marginVertical: 12 }}>
-              <MainButton text="Xác nhận" onPress={handleSubmit} />
-            </View>
+            <View style={{ height: 12 }} />
+            <MainButton
+              text="Xác nhận"
+              onPress={handleSubmit}
+              disabled={loading}
+            />
+            <View style={{ height: 12 }} />
             <AwesomeAlert
               show={showAlert}
               showProgress={false}
@@ -285,12 +299,12 @@ const styles = StyleSheet.create({
   },
   bannerLayout: {
     width: bannerWidth,
-    height: bannerWidth,
+    height: (bannerWidth * 9) / 16,
     backgroundColor: "#DDD",
   },
   banner: {
     width: bannerWidth,
-    height: bannerWidth,
+    height: (bannerWidth * 9) / 16,
   },
   formGroup: {
     marginVertical: 4,
@@ -305,6 +319,8 @@ const styles = StyleSheet.create({
     color: "red",
   },
   details: {
-    minHeight: 100,
+    // minHeight: 100,
+    alignItems: "flex-start",
+    textAlignVertical: "top",
   },
 });

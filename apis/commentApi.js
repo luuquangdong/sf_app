@@ -14,6 +14,21 @@ const getListComment = async (postId, page = 0, size = 20) => {
   }
 };
 
+const getComments = async (postId, lastCommentId, size) => {
+  console.log(postId, lastCommentId, size);
+  console.log("getComments");
+  let url = `/comments/page?postId=${postId}&size=${size}`;
+  if (lastCommentId) url = `${url}&lastCommentId=${lastCommentId}`;
+
+  try {
+    const response = await axiosInstance.get(url);
+
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const createComment = async (data) => {
   console.log("createComment");
   try {
@@ -25,4 +40,4 @@ const createComment = async (data) => {
   }
 };
 
-export { getListComment, createComment };
+export { getListComment, createComment, getComments };

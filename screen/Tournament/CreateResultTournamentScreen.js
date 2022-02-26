@@ -2,9 +2,10 @@ import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { MaterialIcons } from "@expo/vector-icons";
-import { ICON_SIZE } from "../../constant/headerBar";
-import AwesomeAlert from "react-native-awesome-alerts";
 import { useRecoilState } from "recoil";
+import AwesomeAlert from "react-native-awesome-alerts";
+
+import { ICON_SIZE } from "../../constant/headerBar";
 import { reloadState } from "../../recoil/atoms/reloadState";
 
 const CreateResultTournamentScreen = ({ navigation, route }) => {

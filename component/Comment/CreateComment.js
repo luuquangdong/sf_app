@@ -14,20 +14,24 @@ import { useRecoilValue } from "recoil";
 import { createComment } from "../../apis/commentApi";
 import { userState } from "../../recoil/atoms/userState";
 import Avatar from "../Avatar";
+import SendButton from "../SendButton";
 
 export default function CreateComment({ postId, addComment }) {
   const user = useRecoilValue(userState);
   const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSendPressed = async () => {
     if (!content.trim()) return;
     try {
+      setLoading(true);
       const cmt = await createComment({ postId: postId, content: content });
       if (addComment) addComment(cmt);
       setContent("");
     } catch (err) {
       console.log(err);
     }
+    setLoading(false);
   };
 
   return (
@@ -42,9 +46,14 @@ export default function CreateComment({ postId, addComment }) {
           onChangeText={setContent}
         />
       </TouchableWithoutFeedback>
-      <TouchableOpacity onPress={handleSendPressed}>
+      {/* <TouchableOpacity onPress={handleSendPressed}>
         <Text>ĐĂNG</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <SendButton
+        text="ĐĂNG"
+        disabled={!content || loading}
+        onPress={handleSendPressed}
+      />
     </View>
   );
 }
@@ -57,6 +66,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     alignItems: "center",
+    backgroundColor: "#FFF",
   },
   avatar: {
     width: 36,

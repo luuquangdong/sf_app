@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+
 import Comment from "../Comment";
 import { likePost } from "../../apis/postApi";
 import MyImageV2 from "../MyImageV2";
@@ -15,6 +16,7 @@ import { useSetRecoilState } from "recoil";
 import { currentPostState } from "../../recoil/atoms/currentPostState";
 import { formatCalendar } from "../../utils/dateUtils";
 import Avatar from "../Avatar";
+import MyVideo from "../MyVideo";
 
 function PostItem({ onOptionPress, post: p, openComment }) {
   const [showComment, setShowComment] = useState(false);
@@ -42,8 +44,12 @@ function PostItem({ onOptionPress, post: p, openComment }) {
     setPost(newPost);
   };
 
+  if (post.banned && !post.canEdit) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, post.banned && styles.banned]}>
       <View style={styles.post}>
         <View style={styles.header}>
           <Avatar
@@ -63,6 +69,7 @@ function PostItem({ onOptionPress, post: p, openComment }) {
           <Text>{post.content}</Text>
         </View>
         {post.image && <MyImageV2 url={post.image.url} />}
+        {post.video && <MyVideo uri={post.video.url} id={post.video.id} />}
         <View style={styles.action}>
           <TouchableOpacity style={styles.like} onPress={handleLikePost}>
             <MaterialIcons
@@ -136,5 +143,10 @@ const styles = StyleSheet.create({
   },
   comment: {
     flexDirection: "row",
+  },
+  banned: {
+    borderColor: "red",
+    borderWidth: 2,
+    opacity: 0.4,
   },
 });

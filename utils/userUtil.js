@@ -1,5 +1,11 @@
 import moment from "moment";
 
+const formatIsoDate = (y, m, d) => {
+  const mm = `0${m}`.slice(-2);
+  const dd = `0${d}`.slice(-2);
+  return `${y}-${mm}-${dd}`;
+};
+
 const caculateAge = (dateTime) => {
   if (!dateTime) return;
   return moment().diff(dateTime, "years");
@@ -52,4 +58,5 @@ export {
   sportsToObject,
   idToGender,
   sportIdToObject,
+  formatIsoDate,
 };

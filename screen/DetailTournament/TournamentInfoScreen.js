@@ -7,13 +7,15 @@ import {
   SafeAreaView,
   Button,
   TouchableOpacity,
+  Image,
+  Dimensions,
 } from "react-native";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+
 import { tournamentState } from "../../recoil/atoms/tournamentState";
 import TextButton from "../../component/TextButton";
-import MyImageV2 from "../../component/MyImageV2";
 import { requestToJoinTournament } from "../../apis/tournamentApi";
 import { dataBackState } from "../../recoil/atoms/dataBackState";
 import { getListTournamentPost } from "../../apis/postApi";
@@ -24,6 +26,15 @@ import CommentBottomSheet from "../../component/Comment/CommentBottomSheet";
 import Separator from "../../component/Separator";
 import PostItem from "../../component/Post/PostItem";
 import { reloadState } from "../../recoil/atoms/reloadState";
+
+const STATUS = {
+  WAITING: "Chưa bắt đầu",
+  HAPPENING: "Đang diễn ra",
+  FINISHED: "Kết thúc",
+};
+
+const bannerWidth = Dimensions.get("window").width;
+const bannerHeight = (bannerWidth * 9) / 16;
 
 const TournamentInfoScreen = ({ navigation }) => {
   const [dataBack, setDataBack] = useRecoilState(dataBackState);
@@ -102,6 +113,7 @@ const TournamentInfoScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    console.log(tournament);
     if (!tournament) return;
     if (posts.length !== 0) return;
     fetchListTournamentPosts();
@@ -118,7 +130,14 @@ const TournamentInfoScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.inner}>
-        {tournament.banner != null && <MyImageV2 url={tournament.banner.url} />}
+        {/* {tournament.banner != null && <MyImageV2 url={tournament.banner.url} />} */}
+        {tournament.banner != null && (
+          <Image
+            source={{ uri: tournament.banner.url }}
+            style={{ width: bannerWidth, height: bannerHeight }}
+            resizeMode="cover"
+          />
+        )}
         <View style={styles.info}>
           <View style={styles.heading}>
             <Text style={styles.textHeading}>{tournament.name}</Text>
@@ -130,6 +149,10 @@ const TournamentInfoScreen = ({ navigation }) => {
           <Text>
             <Text style={styles.title}>Thời gian: </Text>{" "}
             {`${tournament.startTime} - ${tournament.endTime}`}
+          </Text>
+          <Text>
+            <Text style={styles.title}>Trạng thái: </Text>
+            {STATUS[tournament?.status]}
           </Text>
           <Text>
             <Text style={styles.title}>Địa điểm: </Text>
@@ -146,10 +169,21 @@ const TournamentInfoScreen = ({ navigation }) => {
               <TextButton text="Sửa thông tin" onPress={handleEditPressed} />
             </View>
           ) : tournament.requested ? (
-            <Button title="Hủy yêu cầu" />
-          ) : tournament.joined ? (
-            <Button title="Hủy tham gia" />
-          ) : (
+            // <Button title="Hủy yêu cầu" />
+            <View>
+              <Text
+                style={{
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  padding: 5,
+                  borderRadius: 4,
+                  backgroundColor: "#DDD",
+                }}
+              >
+                Đã gửi yêu cầu
+              </Text>
+            </View>
+          ) : tournament.joined ? null : ( // <Button title="Hủy tham gia" />
             <Button title="Xin tham gia" onPress={handleJoinPressed} />
           )}
           {/* {tournament.canEdit ? (
@@ -210,6 +244,7 @@ const TournamentInfoScreen = ({ navigation }) => {
             );
           })
         )}
+        <View style={{ height: 36 }} />
       </ScrollView>
       <Menu2
         isShow={isShowMenu}

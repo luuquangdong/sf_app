@@ -8,15 +8,16 @@ import {
 } from "react-native";
 import { useRecoilState } from "recoil";
 import { useFocusEffect } from "@react-navigation/native";
+
 import { getListPost } from "../apis/postApi";
 import CommentBottomSheet from "../component/Comment/CommentBottomSheet";
 import LocalErrorBoundary from "../component/LocalErrorBoudary";
-import HeaderCreatePost from "../component/Post/HeaderCreatePost";
 import Menu2 from "../component/Post/Menu2";
 import PostItem from "../component/Post/PostItem";
 import ReportPostMenu from "../component/Post/ReportPostMenu";
 import { dataBackState } from "../recoil/atoms/dataBackState";
 import MyHeader from "../component/MyHeader";
+import EmptyComponent from "../component/EmptyComponent";
 
 const Separator = () => <View style={styles.separator}></View>;
 
@@ -141,7 +142,12 @@ export default function HomeScreen({ navigation }) {
             <Separator />
           </>
         }
-        ListFooterComponent={<Footer loading={loading} endOfData={endOfData} />}
+        ListFooterComponent={
+          posts.length !== 0 && (
+            <Footer loading={loading} endOfData={endOfData} />
+          )
+        }
+        ListEmptyComponent={<EmptyComponent text="Chưa có bài viết nào!" />}
         ItemSeparatorComponent={Separator}
         onEndReached={handleEndReach}
         onEndReachedThreshold={0.01}

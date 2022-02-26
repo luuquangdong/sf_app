@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSetRecoilState } from "recoil";
 import { getUserInfo } from "../apis/userApi";
+
 import { initPhoneNumberState } from "../recoil/atoms/initPhoneNumberState";
 import { userState } from "../recoil/atoms/userState";
 import { getAuthInfo, getPhoneNumber } from "../utils/authUtil";

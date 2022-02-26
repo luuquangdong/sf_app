@@ -23,6 +23,9 @@ import CreateTournamentScreen from "../screen/Tournament/CreateTournamentScreen"
 import CreateTournamentPostScreen from "../screen/Tournament/CreateTournamentPostScreen";
 import MainScreen from "../screen/MainScreen";
 import CreateResultTournamentScreen from "../screen/Tournament/CreateResultTournamentScreen";
+import FirstUpdateInfoScreen from "../screen/User/FirstUpdateInfoScreen";
+import SecondUpdateInfoScreen from "../screen/User/SecondUpdateInfoScreen";
+import SignupOrganizationScreen from "../screen/Individual/SignupOrganizationScreen";
 
 function HomeScreen({ navigation, route }) {
   const { username, password } = route.params;
@@ -217,6 +220,21 @@ function RootStackNavigation() {
         name="UpdateInfo"
         component={UpdateInfoScreen}
         options={{ title: "Cập nhật thông tin" }}
+      />
+      <Stack.Screen
+        name="FirstUpdateInfo"
+        component={FirstUpdateInfoScreen}
+        options={{ title: "Cập nhật thông tin" }}
+      />
+      <Stack.Screen
+        name="SecondUpdateInfo"
+        component={SecondUpdateInfoScreen}
+        options={{ title: "Cập nhật thông tin" }}
+      />
+      <Stack.Screen
+        name="SignupOranization"
+        component={SignupOrganizationScreen}
+        options={{ title: "Đăng ký tổ chức" }}
       />
       <Stack.Screen
         name="ChangePassword"

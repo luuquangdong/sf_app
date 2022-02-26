@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View, FlatList } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+
 import Separator from "../../component/Separator";
 import TournamentItem from "../../component/Tournament/TournamentItem";
 import { getTournamentsJoined } from "../../apis/tournamentApi";
 import EmptyComponent from "../../component/EmptyComponent";
-import { useFocusEffect } from "@react-navigation/native";
 
 const MyTournamentsScreen = () => {
   const [tournaments, setTournaments] = useState([]);

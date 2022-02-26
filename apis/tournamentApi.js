@@ -28,11 +28,24 @@ const uploadBanner = async (banner, tournamentId) => {
   }
 };
 
-const getListTournament = async (size, lastTournamentId) => {
+const updateTournamentInfo = async (info, tournamentId) => {
+  try {
+    console.log("updateTournamentInfo");
+    const response = await axiosInstance.put(
+      `/tournaments/update-info/${tournamentId}`,
+      info
+    );
+
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getListTournament = async (index, size) => {
   try {
     console.log("getListTournament");
-    let url = `/tournaments?size=${size}`;
-    if (lastTournamentId) url = `${url}&lastTournamentId=${lastTournamentId}`;
+    let url = `/tournaments?size=${size}&index=${index}`;
     const response = await axiosInstance.get(url);
 
     return response.data;
@@ -93,6 +106,7 @@ const answerRequest = async (data) => {
 export {
   createTournament,
   uploadBanner,
+  updateTournamentInfo,
   getListTournament,
   getTournamentsJoined,
   getMyTournaments,

@@ -2,6 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { useRecoilState, useRecoilValue } from "recoil";
+
 import { answerRequest, getListRequestFriend } from "../../apis/friendApi";
 import EmptyComponent from "../../component/EmptyComponent";
 import TileConfirm from "../../component/TileConfirm";

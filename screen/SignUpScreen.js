@@ -1,15 +1,16 @@
 import { Formik } from "formik";
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as yup from "yup";
+import { useSetRecoilState } from "recoil";
+import AwesomeAlert from "react-native-awesome-alerts";
+
 import MainButton from "../component/MainButton";
 import { textInput } from "../constant/formStyle";
 import { ERRORS } from "../constant/errors";
 import { signUp } from "../apis/authApi";
-import { useSetRecoilState } from "recoil";
 import { initPhoneNumberState } from "../recoil/atoms/initPhoneNumberState";
-import AwesomeAlert from "react-native-awesome-alerts";
 import { COLORS } from "../constant/colors";
 
 const signUpValidationSchema = yup.object().shape({

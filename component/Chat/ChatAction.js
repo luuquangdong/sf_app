@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Keyboard, StyleSheet, TextInput, View } from "react-native";
-import { useKeyboardHeight } from "../../hooks/useKeyboardHeight";
+import { useKeyboardHeight } from "../../utils/useKeyboardHeight";
+import SendButton from "../SendButton";
 
 const ChatAction = ({ sendMessage }) => {
   const [message, setMessage] = useState("");
@@ -20,7 +21,13 @@ const ChatAction = ({ sendMessage }) => {
         multiline
         onSubmitEditing={Keyboard.dismiss}
       />
-      <Button title="Send" style={styles.button} onPress={handleSendPress} />
+      {/* <Button
+        title=" Gửi "
+        style={styles.button}
+        onPress={handleSendPress}
+        disabled={!message}
+      /> */}
+      <SendButton text="Gửi" disabled={!message} onPress={handleSendPress} />
     </View>
   );
 };
@@ -31,6 +38,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     flex: 1,
+    alignItems: "center",
   },
   input: {
     flex: 4,

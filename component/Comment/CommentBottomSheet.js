@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useRecoilValue } from "recoil";
 import { currentPostState } from "../../recoil/atoms/currentPostState";
 import CommentItem from "./CommentItem";
-import { getListComment } from "../../apis/commentApi";
+import { getComments, getListComment } from "../../apis/commentApi";
 import CreateComment from "./CreateComment";
 import EmptyComponent from "../EmptyComponent";
+import TextButton from "../TextButton";
 
-const SIZE = 30;
+const SIZE = 10;
 
 const CommentBottomSheet = React.forwardRef((props, ref) => {
   const snapPoints = useMemo(() => ["50%", "90%"], []);
@@ -22,13 +23,30 @@ const CommentBottomSheet = React.forwardRef((props, ref) => {
     setComments([...comments, newComment]);
   };
 
-  // const fetchMoreData = async () => {
-  //   if (endOfData) return;
+  const fetchMoreData = async () => {
+    if (endOfData) return;
+    setLoading(true);
+    try {
+      const data = await getComments(post?.id, comments?.[0]?.id, SIZE);
+      setComments([...data, ...comments]);
+      const isEnd = data.length < SIZE;
+      setEndOfData(isEnd);
+    } catch (err) {
+      console.log(err?.response?.data);
+    }
+    setLoading(false);
+  };
+
+  // const fetchNewData = async () => {
+  //   setComments([]);
   //   setLoading(true);
+  //   setPage(0);
+  //   setEndOfData(false);
   //   try {
-  //     console.log({ post: post?.id, page, SIZE });
-  //     const data = await getListComment(post?.id, page, SIZE);
-  //     setComments([...comments, ...data]);
+  //     // console.log({ post: post?.id, page, SIZE });
+  //     const data = await getListComment(post?.id, 0, SIZE);
+  //     // const data = await getComments(post?.id, null, SIZE);
+  //     setComments([...data]);
   //     const isEnd = data.length < SIZE;
   //     setPage(isEnd ? page : page + 1);
   //     setEndOfData(isEnd);
@@ -41,15 +59,11 @@ const CommentBottomSheet = React.forwardRef((props, ref) => {
   const fetchNewData = async () => {
     setComments([]);
     setLoading(true);
-    setPage(0);
     setEndOfData(false);
     try {
-      console.log({ post: post?.id, page, SIZE });
-      const data = await getListComment(post?.id, 0, SIZE);
+      const data = await getComments(post?.id, null, SIZE);
       setComments([...data]);
-      const isEnd = data.length < SIZE;
-      setPage(isEnd ? page : page + 1);
-      setEndOfData(isEnd);
+      setEndOfData(data.length < SIZE);
     } catch (err) {
       console.log(err);
     }
@@ -68,7 +82,23 @@ const CommentBottomSheet = React.forwardRef((props, ref) => {
       <BottomSheetFlatList
         data={comments}
         keyExtractor={(i) => i.id}
-        renderItem={({ item }) => <CommentItem comment={item} />}
+        renderItem={({ item, index }) =>
+          index === 0 && !endOfData ? (
+            <>
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <View style={{ height: 12 }} />
+                <TextButton
+                  text="Tải thêm bình luận trước đó"
+                  onPress={fetchMoreData}
+                />
+                {loading ? <ActivityIndicator /> : null}
+              </View>
+              <CommentItem comment={item} />
+            </>
+          ) : (
+            <CommentItem comment={item} />
+          )
+        }
         contentContainerStyle={styles.contentContainer}
         ListHeaderComponent={
           <CreateComment postId={post?.id} addComment={addComment} />

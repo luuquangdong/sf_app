@@ -7,17 +7,30 @@ import {
   View,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { deleteAuthInfo } from "../../utils/authUtil";
 import { useRecoilState } from "recoil";
+
+import { deleteAuthInfo } from "../../utils/authUtil";
 import { userState } from "../../recoil/atoms/userState";
+import { removeUserPushToken } from "../../apis/userApi";
+import { ROLE } from "../../constant/auth";
 
 const IndividualScreen = ({ navigation }) => {
   const [me, setMe] = useRecoilState(userState);
 
   const handleLogout = async () => {
-    await deleteAuthInfo();
-    setMe(null);
+    removeInfo();
     navigation.replace("Login");
+  };
+
+  const removeInfo = async () => {
+    try {
+      setMe(null);
+      await removeUserPushToken();
+      await deleteAuthInfo();
+    } catch (err) {
+      console.log({ err });
+      console.log(err.response);
+    }
   };
 
   const handleMyPagePressed = () =>
@@ -26,6 +39,8 @@ const IndividualScreen = ({ navigation }) => {
   const handleChangePasswordPressed = () =>
     navigation.navigate("ChangePassword");
 
+  const handleSignupOgrPressed = () => navigation.navigate("SignupOranization");
+
   return (
     <ScrollView>
       <Item
@@ -33,7 +48,13 @@ const IndividualScreen = ({ navigation }) => {
         hasIcon={true}
         onPress={handleMyPagePressed}
       />
-      <Item title="Quảng cáo" hasIcon={true} />
+      {me.role === ROLE.user && (
+        <Item
+          title="Đăng ký thành tổ chức"
+          hasIcon={true}
+          onPress={handleSignupOgrPressed}
+        />
+      )}
       <Item
         title="Đổi mật khẩu"
         hasIcon={true}

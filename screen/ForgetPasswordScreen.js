@@ -1,21 +1,11 @@
-import React, { useCallback, useRef } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import CommentBottomSheet from "../component/Comment/CommentBottomSheet";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import MyButton from "../component/MyButton";
 
 const ForgetPasswordScreen = () => {
-  const sheetRef = useRef(null);
-
-  const openSheet = useCallback(() => {
-    sheetRef.current?.snapToIndex(0);
-    console.log("clicked");
-  }, []);
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <TouchableOpacity onPress={openSheet}>
-        <Text>open sheet</Text>
-      </TouchableOpacity>
-      <Text>That su ik</Text>
-      <CommentBottomSheet ref={sheetRef} />
+    <View style={{ flex: 1 }}>
+      <MyButton text="click me" />
     </View>
   );
 };

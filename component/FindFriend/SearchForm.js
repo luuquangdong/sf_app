@@ -7,23 +7,23 @@ import { textInput } from "../../constant/formStyle";
 import Select from "../Select";
 import { getListSport } from "../../apis/sportApi";
 import { sportListState } from "../../recoil/atoms/sportListState";
+import useSportList from "../../utils/useSportList";
+import { locations } from "../../constant/common";
 
 const PADDING = 10;
 
-// const provinces = ["", "Hà Nội", "Hải Phòng", "Thành Phố Hồ Chí Minh"];
-const provinces = [
-  { id: 1, label: "Hà Nội" },
-  { id: 2, label: "Hải Phòng" },
-  { id: 3, label: "Đà Nắng" },
-  { id: 4, label: "TP Hồ Chí Minh" },
-];
-// const districts = ["", "Hai Bà Trưng", "Đống Đa", "Long Biên", "Trương Định"];
-const districts = [
-  { id: 1, label: "Hai Bà Trưng" },
-  { id: 2, label: "Đống Đa" },
-  { id: 3, label: "Hoàng Mai" },
-];
-// const genders = ["Tất cả", "Nam", "Nữ", "Khác"];
+// const provinces = [
+//   { id: 1, label: "Hà Nội" },
+//   { id: 2, label: "Hải Phòng" },
+//   { id: 3, label: "Đà Nắng" },
+//   { id: 4, label: "TP Hồ Chí Minh" },
+// ];
+// const districts = [
+//   { id: 1, label: "Hai Bà Trưng" },
+//   { id: 2, label: "Đống Đa" },
+//   { id: 3, label: "Hoàng Mai" },
+// ];
+
 const genders = [
   { id: "MALE", label: "Nam" },
   { id: "FEMALE", label: "Nữ" },
@@ -32,23 +32,25 @@ const genders = [
 
 const SearchForm = ({ closeSearchMode, submit }) => {
   const [sports, setSports] = useState([]);
-  const [province, setProvince] = useState("");
-  const [district, setDistrict] = useState("");
+  const [province, setProvince] = useState(null);
+  const [district, setDistrict] = useState(null);
   const [gender, setGender] = useState("");
   const [name, setName] = useState("");
   const [fromAge, setFromAge] = useState("");
   const [toAge, setToAge] = useState("");
   const [age, setAge] = useState("");
 
-  const [sportList, setSportList] = useRecoilState(sportListState);
+  const sportList = useSportList();
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
 
   const handleSubmit = () => {
     const data = {};
     if (name) data.name = name;
     if (sports.length > 0) data.sportIds = sports.map((s) => s.id);
-    if (province) {
-      data.location = { province };
-      if (district) data.location.district = district;
+    if (province?.id) {
+      data.location = { province: province.label };
+      if (district?.id) data.location.district = district.label;
     }
     if (gender) data.gender = gender;
     data.fromAge = fromAge;
@@ -57,20 +59,20 @@ const SearchForm = ({ closeSearchMode, submit }) => {
     submit(data);
   };
 
-  const fetchListSport = async () => {
-    try {
-      let data = await getListSport();
-      data = data.map((s) => ({ ...s, label: s.name }));
-      console.log(data);
-      setSportList(data);
-    } catch (err) {}
-  };
+  useEffect(() => {
+    const data = locations.map((l) => ({
+      label: l.label,
+      id: l.id,
+    }));
+    setProvinces(data);
+  }, []);
 
   useEffect(() => {
-    if (sportList.length === 0) {
-      fetchListSport();
-    }
-  }, []);
+    if (!province) return;
+    const index = locations.findIndex((l) => l.id === province.id);
+
+    if (index !== -1) setDistricts(locations[index]?.districts);
+  }, [province]);
 
   return (
     <View style={styles.container}>

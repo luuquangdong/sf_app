@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -13,6 +12,8 @@ import { useRecoilState } from "recoil";
 import * as ImagePicker from "expo-image-picker";
 import * as yup from "yup";
 import moment from "moment";
+import AwesomeAlert from "react-native-awesome-alerts";
+
 import { userState } from "../../recoil/atoms/userState";
 import { textInput } from "../../constant/formStyle";
 import { COLORS } from "../../constant/colors";
@@ -22,10 +23,9 @@ import MainButton from "../../component/MainButton";
 import { genders } from "../../constant/common";
 import { sportListState } from "../../recoil/atoms/sportListState";
 import { getListSport } from "../../apis/sportApi";
-import { genderToObject } from "../../utils/userUtil";
+import { formatIsoDate, genderToObject } from "../../utils/userUtil";
 import { Formik } from "formik";
 import { updateUserInfo } from "../../apis/userApi";
-import AwesomeAlert from "react-native-awesome-alerts";
 
 const PADDING = 10;
 
@@ -155,7 +155,7 @@ const UpdateInfoScreen = ({ navigation }) => {
     const data = {
       phoneNumber: user.phoneNumber,
       name: user.name,
-      birthday: `${y}-${m}-${d}`,
+      birthday: formatIsoDate(y, m, d),
       gender: gender.id,
       sportIds: sports.map((s) => s.id),
       location: {
@@ -334,7 +334,11 @@ const UpdateInfoScreen = ({ navigation }) => {
               </View>
             )}
             {loading && <ActivityIndicator />}
-            <MainButton text="Cập nhật" onPress={handleSubmit} />
+            <MainButton
+              text="Cập nhật"
+              onPress={handleSubmit}
+              disabled={loading}
+            />
           </View>
         )}
       </Formik>
