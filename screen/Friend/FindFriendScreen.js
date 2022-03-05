@@ -53,15 +53,17 @@ const FindFriendScreen = ({ navigation }) => {
   };
 
   const handleEndReach = async () => {
+    console.log("end reach");
     if (endOfData || loading) return;
     try {
       setLoading(true);
       const data = { ...searchData };
       data.index = users.length;
+      setSearchData(data);
 
       const res = await findFriend(data);
-      setUsers([...users, ...res]);
-
+      const newData = [...users, ...res];
+      setUsers(newData);
       setEndOfData(res.length < SIZE);
       setLoading(false);
     } catch (err) {
@@ -149,7 +151,7 @@ const FindFriendScreen = ({ navigation }) => {
           )
         }
         onEndReached={handleEndReach}
-        onEndReachedThreshold={0.01}
+        onEndReachedThreshold={0.02}
       />
     </View>
   );

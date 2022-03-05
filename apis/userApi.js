@@ -1,8 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-const findFriend = async (data, index = 0, size = 30) => {
-  data.index = index;
-  data.size = size;
+const findFriend = async (data) => {
   try {
     console.log("findFriend");
     const response = await axiosInstance.post("/users/find", data);
