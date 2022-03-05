@@ -23,7 +23,12 @@ const LoadingScreen = ({ navigation }) => {
           console.log({ e });
           setUser(user);
         });
-      navigation.replace("MainScreen");
+
+      if (user.updatedInfo) {
+        navigation.replace("MainScreen");
+      } else {
+        navigation.replace("FirstUpdateInfo");
+      }
       return;
     }
     navigation.replace("Login");

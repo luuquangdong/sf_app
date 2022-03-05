@@ -1,13 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import MyButton from "../component/MyButton";
 
 const ForgetPasswordScreen = () => {
-  return (
-    <View style={{ flex: 1 }}>
-      <MyButton text="click me" />
-    </View>
-  );
+  return <View style={{ flex: 1 }}></View>;
 };
 
 export default ForgetPasswordScreen;

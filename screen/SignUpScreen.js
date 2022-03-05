@@ -32,11 +32,14 @@ const signUpValidationSchema = yup.object().shape({
 export default function SignUpScreen({ navigation, route }) {
   const setPhoneNumber = useSetRecoilState(initPhoneNumberState);
   const [showAlert, setShowAlert] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUpPress = async (values, formProps) => {
     try {
+      setLoading(true);
       await signUp(values);
 
+      setLoading(false);
       setShowAlert(true);
       // Alert.alert("Đăng ký thành công", "", [
       //   {
@@ -50,6 +53,7 @@ export default function SignUpScreen({ navigation, route }) {
       //   },
       // ]);
     } catch (err) {
+      setLoading(false);
       if (err.code && ERRORS[err.code]) {
         formProps.setErrors(ERRORS[err.code]);
       }
@@ -130,7 +134,11 @@ export default function SignUpScreen({ navigation, route }) {
               )}
             </View>
             <View style={{ margin: 6 }} />
-            <MainButton text="Đăng ký" onPress={handleSubmit} />
+            <MainButton
+              text="Đăng ký"
+              onPress={handleSubmit}
+              disabled={loading}
+            />
             <AwesomeAlert
               show={showAlert}
               showProgress={false}

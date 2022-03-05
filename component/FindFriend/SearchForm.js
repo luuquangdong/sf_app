@@ -52,7 +52,7 @@ const SearchForm = ({ closeSearchMode, submit }) => {
       data.location = { province: province.label };
       if (district?.id) data.location.district = district.label;
     }
-    if (gender) data.gender = gender;
+    if (gender) data.gender = gender.id;
     data.fromAge = fromAge;
     data.toAge = toAge;
     data.age = age;
@@ -125,8 +125,8 @@ const SearchForm = ({ closeSearchMode, submit }) => {
         <TextInput
           placeholder="Khoảng độ tuổi gần nhất"
           style={styles.input}
-          value={fromAge}
-          onChangeText={setFromAge}
+          value={age}
+          onChangeText={setAge}
           keyboardType="numeric"
         />
         {/* <View style={{ flexDirection: "row", justifyContent: "space-around" }}>

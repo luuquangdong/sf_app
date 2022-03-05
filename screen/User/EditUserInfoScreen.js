@@ -26,7 +26,7 @@ import Avatar from "../../component/Avatar";
 import TextButton from "../../component/TextButton";
 import MainButton from "../../component/MainButton";
 import { genders, locations } from "../../constant/common";
-import { genderToObject } from "../../utils/userUtil";
+import { formatIsoDate, genderToObject } from "../../utils/userUtil";
 import { updateAvatar, updateUserInfo } from "../../apis/userApi";
 import useSportList from "../../utils/useSportList";
 
@@ -154,7 +154,7 @@ const EditUserInfoScreen = ({ navigation }) => {
     const data = {
       phoneNumber: user.phoneNumber,
       name: values.name,
-      birthday: `${y}-${m}-${d}`,
+      birthday: formatIsoDate(y, m, d),
       gender: gender.id,
       sportIds: sports.map((s) => s.id),
       location: {

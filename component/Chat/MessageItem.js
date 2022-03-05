@@ -8,7 +8,7 @@ const MessageItem = ({ message }) => {
   return (
     <View style={styles.message}>
       <Text>{content}</Text>
-      {isFirst && <Text style={styles.time}>{createdTime}</Text>}
+      {isFirst && <Text style={styles.time}>{formatFromNow(createdTime)}</Text>}
     </View>
   );
 };

@@ -143,11 +143,15 @@ export default function HomeScreen({ navigation }) {
           </>
         }
         ListFooterComponent={
-          posts.length !== 0 && (
-            <Footer loading={loading} endOfData={endOfData} />
-          )
+          <Footer
+            length={posts.length}
+            loading={loading}
+            endOfData={endOfData}
+          />
         }
-        ListEmptyComponent={<EmptyComponent text="Chưa có bài viết nào!" />}
+        ListEmptyComponent={
+          !loading && <EmptyComponent text="Chưa có bài viết nào!" />
+        }
         ItemSeparatorComponent={Separator}
         onEndReached={handleEndReach}
         onEndReachedThreshold={0.01}
@@ -179,11 +183,11 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-const Footer = ({ loading, endOfData }) => {
+const Footer = ({ loading, endOfData, length }) => {
   return (
     <>
-      {loading && !endOfData ? <ActivityIndicator /> : null}
-      {endOfData && (
+      {loading ? <ActivityIndicator /> : null}
+      {endOfData && length !== 0 && (
         <View style={styles.footer}>
           <Text>
             Không còn bài viết, hãy kết thêm bạn để xem thêm được nhiều bài viết

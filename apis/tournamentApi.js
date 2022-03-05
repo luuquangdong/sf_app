@@ -65,6 +65,19 @@ const getTournamentsJoined = async () => {
   }
 };
 
+const deleteParticipant = async (tournamentId, participaintId) => {
+  try {
+    console.log("deleteParticipant");
+    const response = await axiosInstance.delete(
+      `/tournaments/participants/${tournamentId}/${participaintId}`
+    );
+
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const getMyTournaments = async () => {
   try {
     console.log("getMyTournaments");
@@ -112,4 +125,5 @@ export {
   getMyTournaments,
   requestToJoinTournament,
   answerRequest,
+  deleteParticipant,
 };

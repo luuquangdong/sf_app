@@ -82,7 +82,9 @@ const RequestMakeFriendScreen = ({ navigation }) => {
         keyExtractor={(item) => item.phoneNumber}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         ListEmptyComponent={
-          <EmptyComponent text="Hiện bạn không có lời mời kết bạn nào" />
+          !loading && (
+            <EmptyComponent text="Hiện bạn không có lời mời kết bạn nào" />
+          )
         }
         onRefresh={handleRefreshed}
         refreshing={refreshing}

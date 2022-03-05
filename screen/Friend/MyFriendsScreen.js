@@ -52,7 +52,9 @@ const MyFriendsScreen = () => {
         renderItem={({ item }) => <FriendItem friend={item} />}
         ItemSeparatorComponent={Separator}
         keyExtractor={(item) => item.phoneNumber}
-        ListEmptyComponent={<EmptyComponent text="Bạn chưa có người bạn nào" />}
+        ListEmptyComponent={
+          !loading && <EmptyComponent text="Bạn chưa có người bạn nào" />
+        }
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         onRefresh={handleRefresh}
         refreshing={refreshing}

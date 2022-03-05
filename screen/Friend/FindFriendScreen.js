@@ -142,9 +142,11 @@ const FindFriendScreen = ({ navigation }) => {
         keyExtractor={(item) => item.phoneNumber}
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={
-          <EmptyComponent
-            text={"Thành phố bạn đang sống chưa có người dùng nào"}
-          />
+          !loading && (
+            <EmptyComponent
+              text={"Thành phố bạn đang sống chưa có người dùng nào"}
+            />
+          )
         }
         onEndReached={handleEndReach}
         onEndReachedThreshold={0.01}

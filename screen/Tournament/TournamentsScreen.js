@@ -93,10 +93,18 @@ const TournamentsScreen = ({ navigation }) => {
         }
         onEndReached={handleEndReach}
         onEndReachedThreshold={0.01}
-        ListFooterComponent={<Footer loading={loading} endOfData={endOfData} />}
+        ListFooterComponent={
+          <Footer
+            length={tournaments.length}
+            loading={loading}
+            endOfData={endOfData}
+          />
+        }
         ItemSeparatorComponent={Separator}
         ListEmptyComponent={
-          <EmptyComponent text="Hiện không có giải đấu nào sắp diễn ra" />
+          !loading && (
+            <EmptyComponent text="Hiện không có giải đấu nào sắp diễn ra" />
+          )
         }
       />
     </View>
@@ -105,11 +113,11 @@ const TournamentsScreen = ({ navigation }) => {
 
 export default TournamentsScreen;
 
-const Footer = ({ loading, endOfData }) => {
+const Footer = ({ loading, endOfData, length }) => {
   return (
     <>
-      {loading && !endOfData ? <ActivityIndicator /> : null}
-      {endOfData && (
+      {loading ? <ActivityIndicator /> : null}
+      {endOfData && length !== 0 && (
         <View style={styles.footer}>
           <Text>Không còn giải đấu nào nữa.</Text>
         </View>

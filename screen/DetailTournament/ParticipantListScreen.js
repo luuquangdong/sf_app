@@ -13,6 +13,7 @@ import { tournamentState } from "../../recoil/atoms/tournamentState";
 import { Feather } from "@expo/vector-icons";
 import { getListUser } from "../../apis/userApi";
 import EmptyComponent from "../../component/EmptyComponent";
+import { deleteParticipant } from "../../apis/tournamentApi";
 
 const ParticipantListScreen = ({ navigation }) => {
   const tournament = useRecoilValue(tournamentState);
@@ -21,6 +22,15 @@ const ParticipantListScreen = ({ navigation }) => {
 
   const handleItemPressed = (userId) => {
     navigation.navigate("UserInfo", { userId: userId });
+  };
+
+  const handleDeleteParticipant = (participantId) => {
+    const index = participants.findIndex((p) => p.id === participantId);
+    if (index === -1) return;
+    setParticipants([
+      ...participants.splice(0, index),
+      ...participants.splice(index + 1),
+    ]);
   };
 
   const fetchData = async () => {
@@ -48,18 +58,38 @@ const ParticipantListScreen = ({ navigation }) => {
             player={item}
             onPress={handleItemPressed}
             canEdit={tournament.canEdit}
+            deleteParticipantId={handleDeleteParticipant}
+            tournamentId={tournament.id}
           />
         )}
         keyExtractor={(item) => item.phoneNumber}
         ItemSeparatorComponent={Separator}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
-        ListEmptyComponent={<EmptyComponent text="Chưa có thành viên nào" />}
+        ListEmptyComponent={
+          !loading && <EmptyComponent text="Chưa có thành viên nào" />
+        }
       />
     </View>
   );
 };
 
-const ParticipantItem = ({ player, canEdit, onPress }) => {
+const ParticipantItem = ({
+  player,
+  canEdit,
+  onPress,
+  deleteParticipantId,
+  tournamentId,
+}) => {
+  const handleDeleteParticipant = async () => {
+    try {
+      await deleteParticipant(tournamentId, player.id);
+      deleteParticipantId(player.id);
+    } catch (err) {
+      console.log({ err });
+      Alert.alert("Có lỗi xảy ra, xóa thất bại");
+    }
+  };
+
   const createConfirmAlert = () =>
     Alert.alert(
       "Xóa người chơi",
@@ -70,7 +100,7 @@ const ParticipantItem = ({ player, canEdit, onPress }) => {
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
-        { text: "Đồng ý", onPress: () => console.log("OK Pressed", player) },
+        { text: "Đồng ý", onPress: handleDeleteParticipant },
       ]
     );
   const handlePressed = () => {

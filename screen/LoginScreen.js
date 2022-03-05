@@ -135,6 +135,7 @@ export default function LoginScreen({ navigation }) {
                   <Text style={styles.error}>{errors.password}</Text>
                 )}
               </View>
+              <View style={{ height: 4 }} />
               <MainButton
                 text="Đăng nhập"
                 onPress={handleSubmit}
