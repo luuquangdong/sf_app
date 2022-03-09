@@ -217,6 +217,7 @@ const CreatePostScreen = ({ navigation }) => {
           />
         </View>
       )}
+      <View style={{height: 24}}/>
       <AwesomeAlert
         show={showAlert}
         showProgress={false}

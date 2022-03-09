@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Button, Pressable, Text, View } from "react-native";
+import { Button, TouchableOpacity, Text, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLORS } from "../constant/colors";
 import HomeScreen from "../screen/HomeScreen";
 import FindFriendScreen from "../screen/Friend/FindFriendScreen";
@@ -68,7 +68,20 @@ export default function TabNavigation() {
       <Tab.Screen
         name="Message"
         component={ChatScreen}
-        options={{ title: "Tin nhắn" }}
+        // options={{ title: "Tin nhắn" }}
+        options={({ navigation }) => ({
+          title: "Tin nhắn",
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.push("PickFriendForChat")}
+              style={{ paddingRight: 12 }}
+              activeOpacity={0.66}
+            >
+              {/* <MaterialIcons name="trophy" size={ICON_SIZE} color="#FFF" /> */}
+              <MaterialIcons name="add-circle" size={ICON_SIZE} color="#FFF" />
+            </TouchableOpacity>
+          ),
+        })}
       />
       <Tab.Screen
         name="FindFriend"

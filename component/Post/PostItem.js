@@ -1,11 +1,12 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
-  Image,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Pressable,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
@@ -22,6 +23,15 @@ function PostItem({ onOptionPress, post: p, openComment }) {
   const [showComment, setShowComment] = useState(false);
   const setCurrentPost = useSetRecoilState(currentPostState);
   const [post, setPost] = useState(p);
+
+  const [showDetail, setShowDetail] = useState(false);
+  const [contentLength, setContentLength] = useState(4);
+  const [limitLine, setlimitLine] = useState(6);
+
+  const handleTextPress = () => {
+    // if (contentLength < limitLine + 1) return;
+    setShowDetail(!showDetail);
+  };
 
   const handleCommentPress = useCallback(() => {
     if (Platform.OS === "web") {
@@ -43,6 +53,15 @@ function PostItem({ onOptionPress, post: p, openComment }) {
     newPost.likeCount = likedPost.likeCount;
     setPost(newPost);
   };
+
+  const handleTextLayout = useCallback(({ nativeEvent: { lines } }) => {
+    console.log("lines", lines);
+    setContentLength(lines.length);
+  }, []);
+
+  useEffect(() => {
+    if (p.image || p.video) setlimitLine(4);
+  }, []);
 
   if (post.banned && !post.canEdit) {
     return null;
@@ -66,7 +85,15 @@ function PostItem({ onOptionPress, post: p, openComment }) {
           </TouchableOpacity>
         </View>
         <View style={styles.content}>
-          <Text>{post.content}</Text>
+          <TouchableWithoutFeedback onPress={handleTextPress}>
+            <Text
+              onTextLayout={handleTextLayout}
+              ellipsizeMode="tail"
+              numberOfLines={showDetail ? 0 : limitLine}
+            >
+              {post.content}
+            </Text>
+          </TouchableWithoutFeedback>
         </View>
         {post.image && <MyImageV2 url={post.image.url} />}
         {post.video && <MyVideo uri={post.video.url} id={post.video.id} />}

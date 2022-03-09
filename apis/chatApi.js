@@ -2,7 +2,7 @@ import axiosInstance from "./axiosInstance";
 
 const getListRoom = async (userId) => {
   try {
-    console.log("getListRoom");
+    console.log("getListRoom", userId);
     const response = await axiosInstance.get(`/chats/rooms/${userId}`);
 
     return response.data;

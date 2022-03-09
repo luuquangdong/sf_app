@@ -78,6 +78,7 @@ const FindFriendScreen = ({ navigation }) => {
     data.fromAge = myAge - 20 < 0 ? 5 : myAge - 20;
     data.toAge = myAge + 20;
     data.location = { province: me.location?.province };
+    if(me.location?.district) data.location.district = me.location?.district;
     data.sportIds = me.sports?.map((s) => s.id);
     data.gender = me.gender;
     if (!data.age) data.age = myAge;

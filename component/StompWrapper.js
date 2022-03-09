@@ -106,7 +106,8 @@ const StompWrapper = ({ children }) => {
       roomsRef.current = data;
       setRooms(data);
     } catch (err) {
-      console.log(err);
+      console.log({ err });
+      console.log(err.response);
     }
   };
 

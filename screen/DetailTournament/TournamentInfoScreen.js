@@ -103,6 +103,7 @@ const TournamentInfoScreen = ({ navigation }) => {
   };
 
   const fetchListTournamentPosts = async () => {
+    setPosts([]);
     try {
       const data = await getListTournamentPost(tournament.id);
       setPosts(data);
@@ -156,7 +157,7 @@ const TournamentInfoScreen = ({ navigation }) => {
           </Text>
           <Text>
             <Text style={styles.title}>Địa điểm: </Text>
-            {`${tournament.place || "Bách khoa Hà Nội"}`}
+            {`${tournament.location || "Bách khoa Hà Nội"}`}
           </Text>
           <View>
             <Text style={styles.title}>Chi Tiết:</Text>

@@ -26,6 +26,7 @@ import CreateResultTournamentScreen from "../screen/Tournament/CreateResultTourn
 import FirstUpdateInfoScreen from "../screen/User/FirstUpdateInfoScreen";
 import SecondUpdateInfoScreen from "../screen/User/SecondUpdateInfoScreen";
 import SignupOrganizationScreen from "../screen/Individual/SignupOrganizationScreen";
+import PickFriendForChatScreen from "../screen/Chat/PickFriendForChatScreen";
 
 function HomeScreen({ navigation, route }) {
   const { username, password } = route.params;
@@ -176,11 +177,11 @@ function RootStackNavigation() {
         component={MyTournamentTopTab}
         options={{ title: "Giải đấu của tôi" }}
       />
-      {/* <Stack.Screen
-        name="MyTournaments"
-        component={MyTournamentsScreen}
-        options={{ title: "Giải đấu của tôi" }}
-      /> */}
+      <Stack.Screen
+        name="PickFriendForChat"
+        component={PickFriendForChatScreen}
+        options={{ title: "He He" }}
+      />
       <Stack.Screen
         name="DetailTournamentTopTab"
         component={DetailTournamentTopTab}
